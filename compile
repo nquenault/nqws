@@ -1,0 +1,7 @@
+echo 'Compilation GNU/Linux...';
+gcc -o nqws main.c
+echo 'Compilation Win32...';
+i586-mingw32msvc-gcc -o nqws.exe main.c
+
+echo 'Done';
+
