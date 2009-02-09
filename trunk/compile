@@ -1,3 +1,7 @@
+echo 'Removing previous GNU/Linux and Win32 compilations...';
+rm nqws
+rm nqws.exe
+
 echo 'Compilation GNU/Linux...';
 g++ -o nqws main.cpp
 echo 'Compilation Win32...';
