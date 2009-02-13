@@ -13,6 +13,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
+using namespace std;
+
 char syntax()
 	{
 	printf("\nRemote post md5 serveurhaksyn by 0x0syscall\n");
