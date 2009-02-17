@@ -1,31 +1,64 @@
 #! /usr/bin/perl
+#
+# NQWS Client
+# <scriptVersion>0.1.16</scriptVersion>
+#
+# written by Nicolas Quenault
+#
+# Please send bugs, feedbacks and code reviews to nquenault(at)gmail.com
+#
+# Homepage	: http://nqws.googlecode.com/
+# Blog		: http://www.nquenault.fr/
+#
 
 use strict;
 use IO::Socket;
 
-my $version = 0.1.15;
+my $scriptVersion = '0.1.16';
+my $scriptType		= 'beta';
 
-sub prepurl()
+sub encodeArgs()
 {
-	my $url = $_[0];
-	$url =~ s/ /%252520/g;
-	$url =~ s/\./%25252e/g;
-	return $url;
+	my $argument = shift;
+	
+	$argument =~ s/^\s+//; $argument =~ s/\s+$//;
+	my @argument = split '', $argument;
+	
+	my $encodedArg = '';
+	for(my $i=0;$i<@argument;$i++)
+	{
+		my $ascii = ord $argument[$i];
+		if($ascii < 48 ||
+			($ascii > 57 && $ascii < 65) ||
+			($ascii > 90 && $ascii < 97) ||
+			$ascii > 121)
+		{ $encodedArg .= '%2525'.sprintf "%02x", $ascii; }
+		else { $encodedArg .= $argument[$i]; }
+	}
+
+	return $encodedArg;
 }
 
-sub updateScript()
+sub openurl()
 {
-	my $socket = IO::Socket::INET->new(
-		PeerAddr		=> 'nqws.googlecode.com:http(80)'
-	);
-	die "Can't connect to GoogleCode server !\n" unless $socket;
+	my $host = shift;
+	my $path = shift;
+
+	my $socket = IO::Socket::INET->new(PeerAddr => $host, PeerPort => 80);
+	die "Can't connect to ".$host." !\n" unless $socket;
 	
-	$socket->send("GET /svn/trunk/nqws.pl HTTP/1.0\r\nHost: nqws.googlecode.com\r\n\r\n");
+	$socket->send("GET ".$path." HTTP/1.0\r\nHost: ".$host."\r\n\r\n");
 	
 	my $response = '';	
 	while(defined (my $buffer = <$socket>)) { $response .= $buffer; }
 	close($socket);
-	my $newScript = substr($response, index($response, "\r\n\r\n") + length("\r\n\r\n"));
+	
+	return substr($response, index($response, "\r\n\r\n") + length("\r\n\r\n"));
+}
+
+sub updateScript()
+{
+	my $newScript = &openurl('nqws.googlecode.com', '/svn/trunk/nqws.pl');
 	
 	open(FILE,">".__FILE__);
 	print FILE $newScript;
@@ -36,22 +69,9 @@ sub updateScript()
 
 sub listServices()
 {
-	my $socket = IO::Socket::INET->new(
-		PeerAddr		=> 'webservices.nquenault.fr:http(80)'
-	);
-	die "Can't connect to NQWS's server !\n" unless $socket;
-	
-	$socket->send("GET /listservices.html HTTP/1.0\r\nHost: webservices.nquenault.fr\r\n\r\n");
-	
-	my $response = '';	
-	while(defined (my $buffer = <$socket>)) { $response .= $buffer; }
-	close($socket);
-	my $sresponse = substr($response, index($response, "\r\n\r\n") + length("\r\n\r\n"));
-	
+	my $sresponse = &openurl('webservices.nquenault.fr', '/listservices.html');
 	if(index($sresponse, "<title>404 Page Not Found</title>") ne - 1)
-	{
-		die "Service not found\n";
-	}
+		{ die "Service not found\n"; }
 
 	die $sresponse;
 }
@@ -61,43 +81,29 @@ sub requestService()
 	my ($service, $function, $arguments) = @_;
 	my $path = "/services/".$service."/".
 		($function ? "/".$function : "/index").
-		($arguments ? "/".&prepurl($arguments) : '').
-	".html";
+		($arguments ? "/".&encodeArgs($arguments) : '').
+		".html";
 
-	my $socket = IO::Socket::INET->new(
-		PeerAddr		=> 'webservices.nquenault.fr:http(80)'
-	);
-	die "Can't connect to NQWS's server !\n" unless $socket;
-	$socket->send('GET '.$path." HTTP/1.0\r\nHost: webservices.nquenault.fr\r\n\r\n");
-	
-	my $response = '';	
-	while(defined (my $buffer = <$socket>)) { $response .= $buffer; }
-	close($socket);
-	my $sresponse = substr($response, index($response, "\r\n\r\n") + length("\r\n\r\n"));
-	
+	my $sresponse = &openurl('webservices.nquenault.fr', $path);
 	if(index($sresponse, "<title>404 Page Not Found</title>") ne - 1)
-	{
-		die "Service not found\n";
-	}
+		{ die "Service not found\n"; }
 
 	die $sresponse."\n";
 }
 
 sub usage()
 {
-	print __FILE__." [service] [function] [arguments]\n";
-	print __FILE__." [service] usage\n";
+	print "NQWS ".$scriptVersion." client\n\n";
+	print $0." --help\n";
+	print $0." list\n";
+	print $0." [service] [function] [arguments]\n";
+	print $0." [service] usage\n";
+	exit();
 }
 
 if(@ARGV < 1 || (@ARGV >= 1 && $ARGV[0] eq '--help'))
 {
 	usage;
-	exit();
-}
-
-if($ARGV[0] eq 'update')
-{
-	updateScript;
 }
 
 if($ARGV[0] eq 'list')
