@@ -3,6 +3,8 @@
 use strict;
 use IO::Socket;
 
+my $version = 0.1.15;
+
 sub prepurl()
 {
 	my $url = $_[0];
@@ -11,12 +13,33 @@ sub prepurl()
 	return $url;
 }
 
+sub updateScript()
+{
+	my $socket = IO::Socket::INET->new(
+		PeerAddr		=> 'nqws.googlecode.com:http(80)'
+	);
+	die "Can't connect to GoogleCode server !\n" unless $socket;
+	
+	$socket->send("GET /svn/trunk/nqws.pl HTTP/1.0\r\nHost: nqws.googlecode.com\r\n\r\n");
+	
+	my $response = '';	
+	while(defined (my $buffer = <$socket>)) { $response .= $buffer; }
+	close($socket);
+	my $newScript = substr($response, index($response, "\r\n\r\n") + length("\r\n\r\n"));
+	
+	open(FILE,">".__FILE__);
+	print FILE $newScript;
+	close(FILE);
+	
+	exit();
+}
+
 sub listServices()
 {
 	my $socket = IO::Socket::INET->new(
 		PeerAddr		=> 'webservices.nquenault.fr:http(80)'
 	);
-	die "Can't connect to NQWS's server ! $ \n" unless $socket;
+	die "Can't connect to NQWS's server !\n" unless $socket;
 	
 	$socket->send("GET /listservices.html HTTP/1.0\r\nHost: webservices.nquenault.fr\r\n\r\n");
 	
@@ -44,7 +67,7 @@ sub requestService()
 	my $socket = IO::Socket::INET->new(
 		PeerAddr		=> 'webservices.nquenault.fr:http(80)'
 	);
-	die "Can't connect to NQWS's server ! $ \n" unless $socket;
+	die "Can't connect to NQWS's server !\n" unless $socket;
 	$socket->send('GET '.$path." HTTP/1.0\r\nHost: webservices.nquenault.fr\r\n\r\n");
 	
 	my $response = '';	
@@ -62,8 +85,8 @@ sub requestService()
 
 sub usage()
 {
-	print "./nqws [service] [function] [arguments]\n";
-	print "./nqws [service] usage\n";
+	print __FILE__." [service] [function] [arguments]\n";
+	print __FILE__." [service] usage\n";
 }
 
 if(@ARGV < 1 || (@ARGV >= 1 && $ARGV[0] eq '--help'))
@@ -72,9 +95,14 @@ if(@ARGV < 1 || (@ARGV >= 1 && $ARGV[0] eq '--help'))
 	exit();
 }
 
+if($ARGV[0] eq 'update')
+{
+	updateScript;
+}
+
 if($ARGV[0] eq 'list')
 {
-	&listServices();
+	listServices;
 }
 
 my ($service, $function, $arguments) = @ARGV;
