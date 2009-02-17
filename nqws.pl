@@ -3,6 +3,14 @@
 use strict;
 use IO::Socket;
 
+sub prepurl()
+{
+	my $url = $_[0];
+	$url =~ s/ /%252520/g;
+	$url =~ s/\./%25252e/g;
+	return $url;
+}
+
 sub listServices()
 {
 	my $socket = IO::Socket::INET->new(
@@ -30,7 +38,7 @@ sub requestService()
 	my ($service, $function, $arguments) = @_;
 	my $path = "/services/".$service."/".
 		($function ? "/".$function : "/index").
-		($arguments ? "/".$arguments : '').
+		($arguments ? "/".&prepurl($arguments) : '').
 	".html";
 
 	my $socket = IO::Socket::INET->new(
