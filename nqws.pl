@@ -15,7 +15,7 @@ use strict;
 use IO::Socket;
 use Switch;
 
-my $scriptVersion			= 'v0.1.19 beta';
+my $scriptVersion = 'v0.1.19 beta';
 
 $|++; # autoflush
 sub encodeArgs()
