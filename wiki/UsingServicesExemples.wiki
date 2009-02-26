@@ -1,14 +1,6 @@
 #summary Some exemples to show you how to use nqws services
 #labels Phase-Using
 
-= Introduction =
+= Whois Service =
 
-Add your content here.
-
-
-= Details =
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+As simple as this, just type in your prompt *./nqws.pl whois query google.com*, and the result of the whois data for google.com will appear :)
