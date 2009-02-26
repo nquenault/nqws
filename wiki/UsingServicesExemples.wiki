@@ -40,6 +40,7 @@ As simple as using the whois service, you've just to type in your prompt somethi
 mp3download help : _*./nqws.pl mp3download*_
 
 === MP3Download Get ===
+*(working but available on the next release)*
 
 mp3download command : _*./nqws.pl mp3download get* <keywords as artist and/or song title>_<br />
 alternative mp3download command : _*./nqws.pl -o ./output.mp3 mp3download get* <keywords as artist and/or song title>_
@@ -79,8 +80,8 @@ If you want to directly download the mp3 in a file, you can set the argument --o
 ><br />
 > _Enjoy listening :)_<br />
 >
-
 == OpenURL Service ==
+*(working but available on the next release)*
 
 openurl help : _*./nqws.pl openurl*_
 
