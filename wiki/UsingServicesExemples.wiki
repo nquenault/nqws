@@ -27,10 +27,55 @@ sha1 command : _*./nqws.pl sha1 encrypt* <something to encrypt>_
 
 As simple as using the whois service, you've just to type in your prompt something like..<br />
 *./nqws.pl md5 encrypt word*<br />
-_c47d187067c6cf953245f128b5fde62a_<br />
+> _c47d187067c6cf953245f128b5fde62a_<br />
 .. or something like..<br />
 *./nqws.pl md5 encrypt a*<br />
-_0cc175b9c0f1b6a831c399e269772661_<br />
+> _0cc175b9c0f1b6a831c399e269772661_<br />
 .. or something like..<br />
 *./nqws.pl sha1 encrypt I need u to encrypt me*<br />
-_5d9125ffa56b5fe41ec31fd66a516e9b3688ab0c_<br />
+> _5d9125ffa56b5fe41ec31fd66a516e9b3688ab0c_
+
+== MP3Download Service ==
+
+mp3download help : _*./nqws.pl mp3download*_
+
+=== MP3Download Get ===
+
+mp3download command : _*./nqws.pl mp3download get* <keywords as artist and/or song title>_<br />
+alternative mp3download command : _*./nqws.pl -o ./output.mp3 mp3download get* <keywords as artist and/or song title>_
+
+If you're looking for some mp3 quickly and easly, NQWS will enjoy you! for exemple..<br />
+I'm looking for "Clubbed to Death" song title.. i will just type in my prompt..<br />
+*./nqws.pl mp3download get clubbed to death*<br />
+><br />
+> _NQWS Server has returned a file to download (XXXXXX octet(s))_<br />
+> _http://..host../..path to the mp3 file...mp3_<br />
+><br />
+> _Enter an output path or type 'cancel' :_ *./mysong.mp3*<br />
+><br />
+> _Starting download for http://..host../..path to the mp3 file...mp3 (XXXXXX octet(s))_<br />
+> _Output path defined has './mysong.mp3'_<br />
+><br />
+> _Connecting to host.com... OK_<br />
+> _Sending request data... OK_<br />
+> _Receiving data... OK_<br />
+> _Download complete_<br />
+> _Writing file... OK_<br />
+><br />
+> _Enjoy listening :)_<br />
+><br />
+<br />
+If you want to directly download the mp3 in a file, you can set the argument --output (or -o) in the command like..<br />
+*./nqws.pl --output ./mysong.mp3 mp3download get clubbed to death*<br />
+><br />
+> _Starting download for http://..host../..path to the mp3 file...mp3 (XXXXXX octet(s))_<br />
+> _Output path defined has './mysong.mp3'_<br />
+><br />
+> _Connecting to host.com... OK_<br />
+> _Sending request data... OK_<br />
+> _Receiving data... OK_<br />
+> _Download complete_<br />
+> _Writing file... OK_<br />
+><br />
+> _Enjoy listening :)_<br />
+><br />
