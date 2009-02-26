@@ -3,6 +3,6 @@
 
 = Whois Service =
 
-As simple as this, just type in your prompt..
-*./nqws.pl whois query google.com*
+As simple as this, just type in your prompt..<br />
+*./nqws.pl whois query google.com*<br />
 ..and the result of the whois data for google.com will appear :)
