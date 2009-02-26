@@ -1,9 +1,15 @@
 #summary Some exemples to show you how to use nqws services
 #labels Phase-Using
 
+= Somes Services Use Exemples ==
+
 == Whois Service ==
 
-command : _./nqws.pl whois query [host]_
+help : _*./nqws.pl whois*_
+
+=== Whois Query ===
+
+command : _*./nqws.pl whois query* <any domain>_
 
 As simple as this, just type in your prompt..<br />
 *./nqws.pl whois query google.com*<br />
@@ -11,12 +17,20 @@ As simple as this, just type in your prompt..<br />
 
 == MD5 and SHA1 Services ==
 
-command : _./nqws.pl md5 encrypt [something to encrypt]_<br />
-command : _./nqws.pl sha1 encrypt [something to encrypt]_<br />
+md5 help : _*./nqws.pl md5*_<br />
+sha1 help : _*./nqws.pl sha1*_
+
+=== MD5 and SHA1 Encryptions ===
+
+md5 command : _*./nqws.pl md5 encrypt* <something to encrypt>_<br />
+sha1 command : _*./nqws.pl sha1 encrypt* <something to encrypt>_
 
 As simple as using the whois service, you've just to type in your prompt something like..<br />
 *./nqws.pl md5 encrypt word*<br />
 _c47d187067c6cf953245f128b5fde62a_<br />
-or<br />
+.. or something like..<br />
+*./nqws.pl md5 encrypt a*<br />
+_0cc175b9c0f1b6a831c399e269772661_<br />
+.. or something like..<br />
 *./nqws.pl sha1 encrypt I need u to encrypt me*<br />
 _5d9125ffa56b5fe41ec31fd66a516e9b3688ab0c_<br />
