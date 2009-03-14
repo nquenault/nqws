@@ -26,14 +26,20 @@ md5 command : _*./nqws.pl md5 encrypt* <something to encrypt>_<br />
 sha1 command : _*./nqws.pl sha1 encrypt* <something to encrypt>_
 
 As simple as using the whois service, you've just to type in your prompt something like..<br />
-*./nqws.pl md5 encrypt word*<br />
-> _c47d187067c6cf953245f128b5fde62a_<br />
+{{{
+perl ./nqws.pl md5 encrypt word
+> c47d187067c6cf953245f128b5fde62a
+}}}
 .. or something like..<br />
-*./nqws.pl md5 encrypt a*<br />
-> _0cc175b9c0f1b6a831c399e269772661_<br />
+{{{
+perl ./nqws.pl md5 encrypt a
+> 0cc175b9c0f1b6a831c399e269772661
+}}}
 .. or something like..<br />
-*./nqws.pl sha1 encrypt I need u to encrypt me*<br />
-> _5d9125ffa56b5fe41ec31fd66a516e9b3688ab0c_
+{{{
+perl ./nqws.pl sha1 encrypt I need u to encrypt me
+> 5d9125ffa56b5fe41ec31fd66a516e9b3688ab0c
+}}}
 
 == MP3Download Service ==
 
