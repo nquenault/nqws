@@ -51,7 +51,6 @@ sub openurl()
 	
 	my $httprequest  = "GET ".$path." HTTP/1.0\r\n";
 	$httprequest    .= "Host: ".$host."\r\n";
-	$httprequest    .= "Dev-pwd: ".$oe."tsk01\r\n";
 	$httprequest    .= "User-Agent: NQWS Client\r\n";
 	$socket->send($httprequest."\r\n");
 	
