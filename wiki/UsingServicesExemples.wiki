@@ -1,7 +1,7 @@
-#summary Some exemples to show you how to use nqws services
+#summary Some examples to show you how to use nqws services
 #labels Phase-Using
 
-= Somes Services Use Exemples ==
+= Some Services Use Examples ==
 
 == Whois Service ==
 
@@ -80,7 +80,7 @@ alternative mp3download command :
 ./nqws.pl -o ./output.mp3 mp3download get <keywords as artist and/or song title>
 }}}
 
-If you're looking for some mp3 quickly and easly, NQWS will enjoy you! for exemple..<br />
+If you're looking for some mp3 quickly and easily, NQWS will enjoy you! for example..<br />
 I'm looking for "Clubbed to Death" song title.. i will just type in my prompt..<br />
 {{{
 ./nqws.pl mp3download get clubbed to death
