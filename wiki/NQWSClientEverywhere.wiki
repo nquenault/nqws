@@ -2,7 +2,7 @@
 
 == Linux ==
 
-If you've already downloaded nqws.pl, enter that in your bash :
+If you've already downloaded nqws.pl, use this command in your bash :
 {{{
 sudo ln [path_to_nqws.pl] /bin/nqws; sudo chmod a+x /bin/nqws;
 }}}
