@@ -1,11 +1,11 @@
 #!/usr/bin/perl
 #
 # NQWS Client
-# v0.2.0 beta
+# v0.2.1 beta
 #
 # written by Nicolas Quenault
 #
-# Please send bugs, feedbacks and code reviews to nquenault(at)gmail.com
+# Please send bugs, feedbacks and code reviews to nquenault@gmail.com
 #
 # Homepage	: http://nqws.googlecode.com/
 # Blog		: http://www.nquenault.fr/
@@ -15,8 +15,9 @@ use strict;
 use IO::Socket;
 use Switch;
 
-my $scriptVersion  = 'v0.2.0 beta';
+my $scriptVersion  = 'v0.2.1 beta';
 my $autoOutputPath = '';
+my $navigator = 'firefox';
 
 $|++; # autoflush
 sub encodeArgs()
@@ -34,11 +35,36 @@ sub encodeArgs()
 		  ($ascii > 57 && $ascii < 65) ||
 		  ($ascii > 90 && $ascii < 97) ||
 		  $ascii > 122)
-		{ $encodedArg .= '%2525'.sprintf "%02x", $ascii; }
+		{ $encodedArg .= '%'.sprintf "%02x", $ascii; }
 		else { $encodedArg .= $argument[$i]; }
 	}
 
 	return $encodedArg;
+}
+
+sub openBrowser()
+{
+	my $url = shift;
+	
+	my $uresponse = 'n';
+	print "\nNQWS Server has returned an url to open in your browser :\n";
+	print $url."\n\n";
+	print "Would you want to open it [y/n] ";
+	chop($uresponse = <STDIN>);
+	if(
+		$uresponse eq 'y' || $uresponse eq 'yes'
+		|| $uresponse eq 'o' || $uresponse eq 'oui'
+	)
+	{
+		print "\nOpenning the url with ".$navigator." ";
+		print "(edit ".__FILE__." to change browser command)\n";
+		system $navigator." ".$url;
+	}
+	else
+	{
+		print "\nBrowser openning cancelled by user\n";
+	}
+	exit;
 }
 
 sub openurl()
@@ -88,7 +114,19 @@ sub download()
 	my $host       = shift;
 	my $path       = shift;
 	my $size       = shift;
-	my $outputPath = shift;
+	if($size eq '') { $size = &getRemoteFileSize($host, $path); }
+	
+	my $outputPath = '';
+	if($autoOutputPath eq '')
+	{
+		print "\nNQWS Server has returned a file to download (".$size." octet(s)) :\n";
+		print "http://".$host.$path."\n\n";
+		print "Enter an output path or type 'cancel' : ";
+		chop($outputPath = <STDIN>);
+	}
+	else { $outputPath = $autoOutputPath; }
+	
+	if($outputPath eq 'cancel') { die "File download have been canceled\n"; }
 	
 	print "\nStarting download for http://".$host.$path." (".$size." octet(s))\n";
 	print "Output path defined has '".$outputPath."'\n\n";
@@ -200,7 +238,7 @@ sub getRemoteLastVersion()
 sub updateScript()
 {
 	my $version = shift;
-	my $path    = '/svn/tags/'.$version.'/nqws.pl';
+	my $path    = '/svn/tags/'.&encodeArgs($version).'/nqws.pl';
 	
 	print "\nLook for an existing script of NQWS Client ".$version."... ";
 	
@@ -220,7 +258,7 @@ sub updateScript()
 	close(FILE);
 	
 	print "OK\n\nNQWS Client was updated to ".$version."\n";
-	die "\nThanks for using my client script and NQuenault Web Services :)\n\n";
+	die "\nThanks you for using my NQWS Client and NQuenault Web Services :)\n\n";
 }
 
 sub getXmlTag()
@@ -228,7 +266,7 @@ sub getXmlTag()
 	my $xmlContent = shift;
 	my $tagName    = shift;
 	
-	$xmlContent =~ m/<$tagName>(.[^>]*)<\/$tagName>/;
+	$xmlContent =~ m/<$tagName>(.[^<]*)<\/$tagName>/;
 	return $1;
 }
 
@@ -244,7 +282,7 @@ sub requestService()
 	my ($service, $function, $arguments) = @_;
 	my $path = "/services/".$service.
 	   ($function ? "/".$function : "/index").
-	   ($arguments ? "/".&encodeArgs($arguments) : '').
+	   ($arguments ? "/".&encodeArgs(&encodeArgs(&encodeArgs($arguments))) : '').
 	   ".html";
 	   
 	my $socket = IO::Socket::INET->new(PeerAddr => 'webservices.nquenault.fr', PeerPort => 80);
@@ -277,6 +315,10 @@ sub requestService()
 	{
 		die "Service not found\n";
 	}
+	elsif(index($sresponse, "<h4>A PHP Error") ne -1)
+	{
+		die "Service error, please, report to nquenault\@gmail.com including the command line\n";
+	}
 
 	my $command = &getXmlTag($sresponse, 'command');
 	if($command ne '')
@@ -285,29 +327,21 @@ sub requestService()
 		{
 			case 'download'
 			{
-				my $host = &getXmlTag($sresponse, 'host');
-				my $path = &getXmlTag($sresponse, 'path');
-				my $size = &getXmlTag($sresponse, 'size');
-				if($size eq '') { $size = &getRemoteFileSize($host, $path); }
-				
-				my $outputPath = '';
-				if($autoOutputPath eq '')
-				{
-					print "\nNQWS Server has returned a file to download (".$size." octet(s)) :\n";
-					print "http://".$host.$path."\n\n";
-					print "Enter an output path or type 'cancel' : ";
-					chop($outputPath = <STDIN>);
-				}
-				else { $outputPath = $autoOutputPath; }
-				
-				if($outputPath ne 'cancel') { &download($host, $path, $size, $outputPath); }
-				else { die "File download have been canceled\n"; }
+				&download(
+					&getXmlTag($sresponse, 'host'),
+					&getXmlTag($sresponse, 'path'),
+					&getXmlTag($sresponse, 'size')
+				);
+			}
+			case 'openbrowser'
+			{
+				&openBrowser(&getXmlTag($sresponse, 'url'));
 			}
 		}
 	}
 	else { print $sresponse."\n"; }
 	
-	exit();
+	exit;
 }
 
 sub checkForNewerVersion()
@@ -333,13 +367,26 @@ sub usage()
 	print "\nnqws client ".$scriptVersion."\n";
 	print "usage: ".$0." [OPTION...] [SERVICE [FUNCTION [ARGUMENTS]]]\n\n";
 	print " options:\n";
-	print "\t--help; -h:\tprint this message\n";
-	print "\t--list; -l:\tlist availables services on the server\n";
-	print "\t--check; -c:\tcheck for a newer version of NQWS Client\n";
-	print "\t--update; -u:\tdownload the last version of NQWS Client\n";
-	print "\t--output; -o:\tset an auto output file path for download\n";
-	print "\t--spath; -p:\tshow the url for the service to use with Firefox\n";
+	print "\t--help;   \t-h:\tprint this message\n";
+	print "\t--list;   \t-l:\tlist availables services on the server\n";
+	#print "\t--check; \t-c:\tcheck for a newer version of NQWS Client\n";
+	#print "\t--update;\t-u:\tdownload the last version of NQWS Client\n";
+	print "\t--output; \t-o:\tset an auto output file path for download\n";
+	print "\t--spath;  \t-p:\tshow the url for the service to use with Firefox\n";
 	die "\n";
+}
+
+my $remoteVersion = &getRemoteLastVersion();
+if(&isHigherVersion($remoteVersion, $scriptVersion) == 1)
+{
+	print "\nNQWS Client ".$remoteVersion." is available !\n";
+	print "Want you to update the client script ? [y/n] ";
+	chop(my $response = <STDIN>);
+	if($response eq 'y' || $response eq 'yes' || $response eq 'o')
+	{
+		&updateScript($remoteVersion);
+		exit;
+	}
 }
 
 if(@ARGV < 1 || (@ARGV >= 1 && (
@@ -349,9 +396,9 @@ if(@ARGV < 1 || (@ARGV >= 1 && (
 
 my $option = shift;
 
-if($option eq '--update' || $option eq '-u') { updateScript; }
 if($option eq '--list'   || $option eq '-l') { listServices; }
-if($option eq '--check'  || $option eq '-c') { checkForNewerVersion; }
+#if($option eq '--update' || $option eq '-u') { updateScript; }
+#if($option eq '--check'  || $option eq '-c') { checkForNewerVersion; }
 if($option eq '--output' || $option eq '-o') { $autoOutputPath = shift; $option = shift; }
 if($option eq '--spath'  || $option eq '-p') {
 	my $service   = shift;
@@ -359,7 +406,7 @@ if($option eq '--spath'  || $option eq '-p') {
 	my $arguments = join(' ', @ARGV);
 	print "Path : http://webservices.nquenault.fr/services/".$service.
 	   ($function ? "/".$function : "/index").
-	   ($arguments ? "/".&encodeArgs($arguments) : '').
+	   ($arguments ? "/".&encodeArgs(&encodeArgs(&encodeArgs($arguments))) : '').
 	   ".html\n";
 	exit;
 }
